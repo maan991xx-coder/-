@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة الإدارة • محمود & ثويبة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@400;700&family=Tajawal:wght@300;400;500;700&family=Cinzel:wght@400;500;700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+  :root {
+    --parchment: #e8d4a8;
+    --parchment-light: #f5e8c8;
+    --wax-red: #8b1a2e;
+    --wax-red-light: #c0253a;
+    --wax-red-dark: #5a0f1e;
+    --gold: #d4a85c;
+    --gold-light: #f5d486;
+    --gold-deep: #a8842e;
+    --night-deep: #0a0518;
+    --night-mid: #1a1530;
+    --ink: #2a1810;
+    --success: #4ade80;
+    --danger: #f87171;
+    --warning: #fbbf24;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background:
+      radial-gradient(ellipse at 80% 10%, rgba(212, 168, 92, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 90%, rgba(139, 26, 46, 0.08) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0518 0%, #1a0f28 50%, #0a0518 100%);
+    color: var(--parchment-light);
+    min-height: 100vh;
+    direction: rtl;
+    overflow-x: hidden;
+  }
+
+  #bg-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ================================== */
+  /* ====== PASSWORD GATE ============ */
+  /* ================================== */
+  #password-gate {
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(80, 50, 120, 0.3) 0%, transparent 50%),
+      linear-gradient(180deg, #050310, #0a0518);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  #password-gate.unlocked {
+    opacity: 0;
+    transform: scale(1.5);
+    pointer-events: none;
+  }
+
+  .gate-card {
+    width: min(90vw, 460px);
+    background:
+      linear-gradient(135deg, rgba(212, 168, 92, 0.1), rgba(139, 26, 46, 0.05));
+    border: 1px solid rgba(212, 168, 92, 0.3);
+    border-radius: 20px;
+    padding: 50px 40px;
+    text-align: center;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    position: relative;
+    animation: gate-rise 1s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+
+  @keyframes gate-rise {
+    from { opacity: 0; transform: translateY(40px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .gate-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--wax-red), var(--gold), transparent);
+    border-radius: 20px 20px 0 0;
+  }
+
+  .gate-icon {
+    width: 90px; height: 90px;
+    margin: 0 auto 24px;
+    background:
+      radial-gradient(circle at 38% 32%, #d92e48, #8b1a2e 60%, #5a0f1e);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 8px 30px rgba(139, 26, 46, 0.5),
+      inset 0 3px 6px rgba(255, 100, 100, 0.2),
+      inset 0 -4px 8px rgba(0,0,0,0.4);
+    position: relative;
+    animation: gate-icon-pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes gate-icon-pulse {
+    0%, 100% { box-shadow: 0 8px 30px rgba(139, 26, 46, 0.5), inset 0 3px 6px rgba(255, 100, 100, 0.2), inset 0 -4px 8px rgba(0,0,0,0.4), 0 0 0 0 rgba(212, 168, 92, 0); }
+    50% { box-shadow: 0 8px 30px rgba(139, 26, 46, 0.5), inset 0 3px 6px rgba(255, 100, 100, 0.2), inset 0 -4px 8px rgba(0,0,0,0.4), 0 0 40px 5px rgba(212, 168, 92, 0.3); }
+  }
+
+  .gate-icon::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(212, 168, 92, 0.5);
+  }
+
+  .gate-icon-text {
+    font-family: 'Aref Ruqaa Ink', serif;
+    color: var(--gold-light);
+    font-size: 1.4rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    z-index: 1;
+  }
+
+  .gate-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .gate-title {
+    font-family: 'Aref Ruqaa Ink', serif;
+    font-size: 1.8rem;
+    background: linear-gradient(180deg, #f5e8c8, #d4a85c);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+
+  .gate-subtitle {
+    font-size: 0.85rem;
+    color: rgba(245, 232, 200, 0.7);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  .gate-input-wrap {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .gate-input {
+    width: 100%;
+    padding: 16px 20px;
+    border: 1.5px solid rgba(212, 168, 92, 0.3);
+    border-radius: 12px;
+    background: rgba(10, 5, 24, 0.6);
+    color: var(--parchment-light);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1rem;
+    text-align: center;
+    letter-spacing: 4px;
+    outline: none;
+    transition: all 0.3s ease;
+    direction: ltr;
+  }
+
+  .gate-input:focus {
+    border-color: var(--gold);
+    background: rgba(10, 5, 24, 0.8);
+    box-shadow: 0 0 0 4px rgba(212, 168, 92, 0.15);
+  }
+
+  .gate-input.error {
+    border-color: var(--danger);
+    animation: shake 0.4s ease;
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .gate-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--wax-red), var(--wax-red-dark));
+    color: var(--gold-light);
+    border: 1px solid rgba(212, 168, 92, 0.3);
+    border-radius: 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(139, 26, 46, 0.3);
+    margin-top: 8px;
+  }
+
+  .gate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(139, 26, 46, 0.4);
+    border-color: var(--gold);
+  }
+
+  .gate-error {
+    color: var(--danger);
+    font-size: 0.85rem;
+    margin-top: 12px;
+    height: 18px;
+  }
+
+  /* ================================== */
+  /* ====== ADMIN PANEL ============== */
+  /* ================================== */
+  #admin-panel {
+    display: none;
+    padding: 30px 20px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+
+  #admin-panel.shown {
+    display: block;
+    animation: panel-fade-in 1s ease;
+  }
+
+  @keyframes panel-fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .admin-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 30px 20px;
+    border-bottom: 1px solid rgba(212, 168, 92, 0.2);
+  }
+
+  .admin-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 5px;
+    color: var(--gold);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .admin-title {
+    font-family: 'Aref Ruqaa Ink', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    background: linear-gradient(180deg, #f5e8c8, #d4a85c);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+
+  .admin-sub {
+    font-size: 0.85rem;
+    color: rgba(245, 232, 200, 0.6);
+    letter-spacing: 2px;
+  }
+
+  /* Stats Bar */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+
+  .stat-card {
+    background:
+      linear-gradient(135deg, rgba(212, 168, 92, 0.08), rgba(139, 26, 46, 0.04));
+    border: 1px solid rgba(212, 168, 92, 0.25);
+    border-radius: 14px;
+    padding: 24px 20px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover { transform: translateY(-4px); }
+
+  .stat-icon { font-size: 1.8rem; margin-bottom: 10px; display: block; }
+
+  .stat-num {
+    font-family: 'Cinzel', serif;
+    font-size: 2.2rem;
+    color: var(--gold-light);
+    display: block;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+    text-shadow: 0 0 12px rgba(212, 168, 92, 0.3);
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    color: rgba(245, 232, 200, 0.6);
+    text-transform: uppercase;
+  }
+
+  /* Scanner Section */
+  .scanner-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+
+  .scanner-card {
+    background:
+      linear-gradient(135deg, rgba(212, 168, 92, 0.08), rgba(10, 5, 24, 0.5));
+    border: 1px solid rgba(212, 168, 92, 0.3);
+    border-radius: 18px;
+    padding: 24px;
+    backdrop-filter: blur(10px);
+  }
+
+  .scanner-card-title {
+    font-family: 'Aref Ruqaa Ink', serif;
+    font-size: 1.4rem;
+    color: var(--gold-light);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #qr-reader {
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    background: black;
+    border: 2px solid rgba(212, 168, 92, 0.3);
+    min-height: 280px;
+    position: relative;
+  }
+
+  #qr-reader video {
+    width: 100% !important;
+    border-radius: 10px;
+  }
+
+  #qr-reader__dashboard_section_csr {
+    padding: 12px !important;
+    background: rgba(212, 168, 92, 0.1) !important;
+  }
+
+  #qr-reader__dashboard_section_csr button {
+    background: var(--wax-red) !important;
+    color: var(--gold-light) !important;
+    border: 1px solid var(--gold) !important;
+    padding: 10px 16px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    font-family: 'Tajawal', sans-serif !important;
+    font-size: 0.85rem !important;
+    margin: 4px !important;
+  }
+
+  #qr-reader select {
+    padding: 10px !important;
+    border-radius: 8px !important;
+    background: rgba(10, 5, 24, 0.8) !important;
+    color: var(--parchment-light) !important;
+    border: 1px solid rgba(212, 168, 92, 0.3) !important;
+  }
+
+  .scanner-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .scanner-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: 12px 20px;
+    background: rgba(212, 168, 92, 0.1);
+    color: var(--gold-light);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+
+  .scanner-btn:hover {
+    background: var(--gold);
+    color: var(--ink);
+    transform: translateY(-2px);
+  }
+
+  .scanner-btn.danger {
+    border-color: var(--wax-red-light);
+    color: #ffb0b8;
+  }
+
+  .scanner-btn.danger:hover {
+    background: var(--wax-red);
+    color: var(--gold-light);
+  }
+
+  /* Scan Result */
+  .scan-result {
+    min-height: 280px;
+  }
+
+  .scan-result-empty {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: rgba(245, 232, 200, 0.4);
+    padding: 30px;
+    border: 2px dashed rgba(212, 168, 92, 0.2);
+    border-radius: 12px;
+    min-height: 280px;
+  }
+
+  .scan-result-empty-icon {
+    font-size: 3rem;
+    margin-bottom: 14px;
+    opacity: 0.5;
+  }
+
+  .result-card {
+    border-radius: 14px;
+    padding: 24px;
+    animation: result-pop 0.5s cubic-bezier(0.2, 1.5, 0.5, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  @keyframes result-pop {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .result-card.success {
+    background: linear-gradient(135deg, rgba(74, 222, 128, 0.15), rgba(34, 100, 60, 0.08));
+    border: 2px solid rgba(74, 222, 128, 0.5);
+  }
+
+  .result-card.duplicate {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(120, 80, 20, 0.08));
+    border: 2px solid rgba(251, 191, 36, 0.5);
+  }
+
+  .result-card.error {
+    background: linear-gradient(135deg, rgba(248, 113, 113, 0.15), rgba(120, 30, 30, 0.08));
+    border: 2px solid rgba(248, 113, 113, 0.5);
+  }
+
+  .result-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(212, 168, 92, 0.2);
+  }
+
+  .result-status-icon { font-size: 1.6rem; }
+
+  .result-card.success .result-status { color: #4ade80; }
+  .result-card.duplicate .result-status { color: #fbbf24; }
+  .result-card.error .result-status { color: #f87171; }
+
+  .result-name {
+    font-family: 'Aref Ruqaa Ink', serif;
+    font-size: 1.8rem;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .result-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .result-detail-box {
+    background: rgba(10, 5, 24, 0.4);
+    border-radius: 8px;
+    padding: 14px;
+    border-right: 2px solid var(--gold);
+  }
+
+  .result-detail-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .result-detail-value {
+    font-size: 1rem;
+    color: var(--parchment-light);
+    font-weight: 500;
+  }
+
+  .result-detail-value.big {
+    font-family: 'Cinzel', serif;
+    font-size: 1.8rem;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+
+  .result-progress {
+    margin-top: 16px;
+    padding: 14px;
+    background: rgba(10, 5, 24, 0.4);
+    border-radius: 10px;
+  }
+
+  .result-progress-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    color: var(--gold);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  .result-progress-bar {
+    height: 8px;
+    background: rgba(212, 168, 92, 0.15);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .result-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-light));
+    border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+
+  .result-progress-text {
+    font-size: 0.8rem;
+    margin-top: 8px;
+    color: rgba(245, 232, 200, 0.7);
+  }
+
+  /* Scan log */
+  .log-section {
+    background:
+      linear-gradient(135deg, rgba(212, 168, 92, 0.08), rgba(10, 5, 24, 0.5));
+    border: 1px solid rgba(212, 168, 92, 0.25);
+    border-radius: 18px;
+    padding: 28px;
+    backdrop-filter: blur(10px);
+  }
+
+  .log-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .log-title {
+    font-family: 'Aref Ruqaa Ink', serif;
+    font-size: 1.4rem;
+    color: var(--gold-light);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .log-search {
+    flex: 1;
+    max-width: 280px;
+    padding: 10px 16px;
+    background: rgba(10, 5, 24, 0.6);
+    border: 1px solid rgba(212, 168, 92, 0.3);
+    border-radius: 8px;
+    color: var(--parchment-light);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    direction: rtl;
+  }
+
+  .log-search:focus { border-color: var(--gold); }
+
+  .log-table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid rgba(212, 168, 92, 0.15);
+  }
+
+  .log-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+
+  .log-table thead {
+    background: rgba(212, 168, 92, 0.1);
+  }
+
+  .log-table th {
+    padding: 14px 16px;
+    text-align: right;
+    font-family: 'Cinzel', serif;
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(212, 168, 92, 0.2);
+  }
+
+  .log-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(212, 168, 92, 0.08);
+    color: rgba(245, 232, 200, 0.85);
+  }
+
+  .log-table tr:hover { background: rgba(212, 168, 92, 0.04); }
+
+  .log-empty {
+    text-align: center;
+    padding: 50px 20px;
+    color: rgba(245, 232, 200, 0.4);
+  }
+
+  .log-empty-icon { font-size: 3rem; margin-bottom: 12px; display: block; opacity: 0.4; }
+
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .badge.attended { background: rgba(74, 222, 128, 0.2); color: #6ee7b7; }
+  .badge.duplicate { background: rgba(251, 191, 36, 0.2); color: #fcd34d; }
+
+  .log-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  /* Sound feedback toggle */
+  .sound-toggle {
+    position: fixed;
+    bottom: 20px; left: 20px;
+    width: 50px; height: 50px;
+    background: rgba(10, 5, 24, 0.9);
+    border: 1px solid rgba(212, 168, 92, 0.4);
+    border-radius: 50%;
+    color: var(--gold-light);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    backdrop-filter: blur(10px);
+    z-index: 50;
+    transition: all 0.3s ease;
+  }
+
+  .sound-toggle:hover { background: var(--gold); color: var(--ink); }
+
+  /* Logout */
+  .logout-btn {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    padding: 10px 18px;
+    background: rgba(139, 26, 46, 0.85);
+    border: 1px solid rgba(212, 168, 92, 0.4);
+    border-radius: 10px;
+    color: var(--gold-light);
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    backdrop-filter: blur(10px);
+    z-index: 50;
+    transition: all 0.3s ease;
+  }
+
+  .logout-btn:hover { background: var(--wax-red); transform: translateY(-2px); }
+
+  /* ================================== */
+  /* ====== RESPONSIVE =============== */
+  /* ================================== */
+  @media (max-width: 768px) {
+    .scanner-wrap { grid-template-columns: 1fr; }
+    .gate-card { padding: 36px 24px; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .result-detail-grid { grid-template-columns: 1fr; }
+    .log-table th, .log-table td { padding: 10px 8px; font-size: 0.78rem; }
+    .log-header { flex-direction: column; align-items: stretch; }
+    .log-search { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- ============================================= -->
+<!-- PASSWORD GATE                                 -->
+<!-- ============================================= -->
+<div id="password-gate">
+  <div class="gate-card">
+    <div class="gate-icon">
+      <span class="gate-icon-text">M&T</span>
+    </div>
+
+    <div class="gate-tag">✦ Admin Access ✦</div>
+    <h1 class="gate-title">لوحة الإدارة</h1>
+    <p class="gate-subtitle">يرجى إدخال الرمز السري للوصول إلى نظام مسح بطاقات الدخول.</p>
+
+    <div class="gate-input-wrap">
+      <input type="password" id="gate-input" class="gate-input" placeholder="••••••••" autocomplete="off">
+    </div>
+
+    <button class="gate-btn" onclick="checkPassword()">
+      ✦ دخول ✦
+    </button>
+
+    <div class="gate-error" id="gate-error"></div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- ADMIN PANEL                                   -->
+<!-- ============================================= -->
+<div id="admin-panel">
+
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="admin-tag">✦ Wedding Check-in System ✦</div>
+    <h1 class="admin-title">محمود & ثويبة</h1>
+    <p class="admin-sub">نظام مسح بطاقات الدخول • 15 سبتمبر 2025</p>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <span class="stat-icon">✅</span>
+      <span class="stat-num" id="stat-checked">0</span>
+      <span class="stat-label">تم تسجيل دخولهم</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">👥</span>
+      <span class="stat-num" id="stat-unique">0</span>
+      <span class="stat-label">مجموعات الحضور</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">⚠️</span>
+      <span class="stat-num" id="stat-dup">0</span>
+      <span class="stat-label">محاولات مكررة</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">🕐</span>
+      <span class="stat-num" id="stat-recent">—</span>
+      <span class="stat-label">آخر تسجيل</span>
+    </div>
+  </div>
+
+  <!-- Scanner & Result -->
+  <div class="scanner-wrap">
+
+    <!-- Camera scanner -->
+    <div class="scanner-card">
+      <div class="scanner-card-title">📷 ماسح الكاميرا</div>
+      <div id="qr-reader"></div>
+      <div class="scanner-controls">
+        <button class="scanner-btn" id="start-btn" onclick="startScanner()">▶ بدء المسح</button>
+        <button class="scanner-btn danger" id="stop-btn" onclick="stopScanner()" style="display:none">⏸ إيقاف</button>
+      </div>
+    </div>
+
+    <!-- Scan Result -->
+    <div class="scanner-card">
+      <div class="scanner-card-title">🎫 نتيجة المسح</div>
+      <div class="scan-result" id="scan-result">
+        <div class="scan-result-empty">
+          <div class="scan-result-empty-icon">📡</div>
+          <div>في انتظار مسح بطاقة دخول...</div>
+          <div style="font-size:0.8rem;margin-top:8px;opacity:0.7">قم بتوجيه الكاميرا نحو رمز QR</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Log Section -->
+  <div class="log-section">
+    <div class="log-header">
+      <div class="log-title">📋 سجل التسجيلات</div>
+      <input type="text" class="log-search" id="log-search" placeholder="🔍 بحث بالاسم..." oninput="renderLog()">
+    </div>
+
+    <div class="log-table-wrap">
+      <table class="log-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>الاسم</th>
+            <th>المسجِّل الرئيسي</th>
+            <th>البطاقة</th>
+            <th>المجموعة</th>
+            <th>الوقت</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody id="log-body">
+          <tr><td colspan="7" class="log-empty">
+            <div class="log-empty-icon">📭</div>
+            لم يتم تسجيل أي بطاقة بعد
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="log-actions">
+      <button class="scanner-btn" onclick="exportCSV()">📥 تصدير CSV</button>
+      <button class="scanner-btn danger" onclick="clearLog()">🗑️ مسح السجل</button>
+    </div>
+  </div>
+
+</div>
+
+<button class="sound-toggle" id="sound-toggle" onclick="toggleSound()" title="تشغيل/إيقاف الصوت">🔊</button>
+<button class="logout-btn" onclick="logout()" id="logout-btn" style="display:none">🚪 خروج</button>
+
+<script>
+// =====================================================
+// CONSTANTS
+// =====================================================
+const CORRECT_PASSWORD = '93584113@';
+const SCAN_LOG_KEY = 'wedding_mt_admin_scans_v1';
+const SOUND_ENABLED_KEY = 'wedding_mt_admin_sound';
+const EVENT_CODE = 'MT2025';
+const SESSION_KEY = 'wedding_mt_admin_session';
+
+// =====================================================
+// STORAGE
+// =====================================================
+function safeGet(key) {
+  try { return JSON.parse(localStorage.getItem(key) || 'null'); }
+  catch(e) { return null; }
+}
+function safeSet(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+  catch(e) { return false; }
+}
+
+let scanLog = safeGet(SCAN_LOG_KEY) || [];
+let soundEnabled = safeGet(SOUND_ENABLED_KEY);
+if (soundEnabled === null) soundEnabled = true;
+
+// =====================================================
+// BACKGROUND CANVAS (subtle stars/particles)
+// =====================================================
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [], stars = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * canvas.width;
+    this.y = canvas.height + 20;
+    this.size = Math.random() * 2 + 0.8;
+    this.speedY = Math.random() * 0.4 + 0.15;
+    this.speedX = (Math.random() - 0.5) * 0.2;
+    this.opacity = Math.random() * 0.5 + 0.15;
+  }
+  update() {
+    this.y -= this.speedY;
+    this.x += this.speedX;
+    if (this.y < -10) this.reset();
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.opacity;
+    ctx.fillStyle = '#f5d486';
+    ctx.shadowColor = '#d4a85c';
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+class Star {
+  constructor() {
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height * 0.6;
+    this.size = Math.random() * 1.2 + 0.4;
+    this.opacity = Math.random();
+    this.twinkle = Math.random() * 0.015 + 0.005;
+  }
+  update() {
+    this.opacity += this.twinkle;
+    if (this.opacity > 1 || this.opacity < 0.1) this.twinkle *= -1;
+  }
+  draw() {
+    ctx.save();
+    ctx.globalAlpha = this.opacity * 0.5;
+    ctx.fillStyle = '#fff8e0';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+for (let i = 0; i < 25; i++) {
+  const p = new Particle();
+  p.y = Math.random() * canvas.height;
+  particles.push(p);
+}
+for (let i = 0; i < 60; i++) stars.push(new Star());
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => { s.update(); s.draw(); });
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// =====================================================
+// PASSWORD GATE
+// =====================================================
+function checkPassword() {
+  const input = document.getElementById('gate-input');
+  const error = document.getElementById('gate-error');
+  const value = input.value;
+
+  if (value === CORRECT_PASSWORD) {
+    error.textContent = '';
+    safeSet(SESSION_KEY, { authenticated: true, time: Date.now() });
+    document.getElementById('password-gate').classList.add('unlocked');
+    setTimeout(() => {
+      document.getElementById('password-gate').style.display = 'none';
+      document.getElementById('admin-panel').classList.add('shown');
+      document.getElementById('logout-btn').style.display = 'inline-block';
+      updateStats();
+      renderLog();
+    }, 800);
+  } else {
+    input.classList.add('error');
+    error.textContent = '❌ الرمز السري غير صحيح';
+    setTimeout(() => input.classList.remove('error'), 500);
+    input.value = '';
+    input.focus();
+  }
+}
+
+document.getElementById('gate-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') checkPassword();
+});
+
+document.getElementById('gate-input').focus();
+
+// Auto-restore session if valid (lasts 4 hours)
+const session = safeGet(SESSION_KEY);
+if (session && session.authenticated && (Date.now() - session.time) < 4 * 60 * 60 * 1000) {
+  document.getElementById('password-gate').style.display = 'none';
+  document.getElementById('admin-panel').classList.add('shown');
+  document.getElementById('logout-btn').style.display = 'inline-block';
+  updateStats();
+  renderLog();
+}
+
+function logout() {
+  if (!confirm('هل تريد الخروج من لوحة الإدارة؟')) return;
+  localStorage.removeItem(SESSION_KEY);
+  stopScanner();
+  location.reload();
+}
+
+// =====================================================
+// QR SCANNER
+// =====================================================
+let html5QrCode = null;
+let scannerActive = false;
+let lastScanTime = 0;
+let lastScanText = '';
+
+async function startScanner() {
+  if (scannerActive) return;
+
+  try {
+    if (!html5QrCode) {
+      html5QrCode = new Html5Qrcode("qr-reader");
+    }
+
+    const config = {
+      fps: 10,
+      qrbox: { width: 240, height: 240 },
+      aspectRatio: 1.0,
+      experimentalFeatures: { useBarCodeDetectorIfSupported: true }
+    };
+
+    await html5QrCode.start(
+      { facingMode: "environment" },
+      config,
+      onScanSuccess,
+      () => {} // ignore decode errors
+    );
+
+    scannerActive = true;
+    document.getElementById('start-btn').style.display = 'none';
+    document.getElementById('stop-btn').style.display = 'inline-block';
+  } catch (err) {
+    console.error('Scanner error:', err);
+    showResult('error', '❌ خطأ في الكاميرا',
+      'لم نتمكن من الوصول إلى الكاميرا.<br><br>' +
+      'تأكد من السماح بأذونات الكاميرا، أو جرب على متصفح آخر.<br><br>' +
+      '<small style="opacity:0.7">' + (err.message || err) + '</small>');
+  }
+}
+
+async function stopScanner() {
+  if (!html5QrCode || !scannerActive) {
+    document.getElementById('start-btn').style.display = 'inline-block';
+    document.getElementById('stop-btn').style.display = 'none';
+    return;
+  }
+
+  try {
+    await html5QrCode.stop();
+    scannerActive = false;
+    document.getElementById('start-btn').style.display = 'inline-block';
+    document.getElementById('stop-btn').style.display = 'none';
+  } catch (e) {
+    console.warn('stop error', e);
+  }
+}
+
+function onScanSuccess(decodedText) {
+  // Debounce same scan
+  const now = Date.now();
+  if (decodedText === lastScanText && now - lastScanTime < 2500) return;
+  lastScanText = decodedText;
+  lastScanTime = now;
+
+  let data;
+  try {
+    data = JSON.parse(decodedText);
+  } catch(e) {
+    showResult('error', '❌ كود غير صالح', 'لم نتمكن من قراءة بيانات هذه البطاقة. تأكد من أنها بطاقة زفاف صحيحة.');
+    playSound('error');
+    return;
+  }
+
+  if (!data || data.e !== EVENT_CODE) {
+    showResult('error', '❌ بطاقة لا تخص هذا الحفل',
+      'هذه البطاقة ليست لحفل زفاف محمود وثويبة.');
+    playSound('error');
+    return;
+  }
+
+  // Check if this specific QR (uniqueId) was scanned before
+  const previousScan = scanLog.find(s => s.uniqueId === data.u);
+
+  if (previousScan) {
+    // Duplicate scan
+    showResult('duplicate', '⚠️ بطاقة مستخدمة مسبقاً', null, data, previousScan);
+    playSound('warn');
+
+    // Record duplicate attempt
+    scanLog.push({
+      ...buildLogEntry(data),
+      isDuplicate: true,
+      originalScanTime: previousScan.scannedAt
+    });
+    safeSet(SCAN_LOG_KEY, scanLog);
+    updateStats();
+    renderLog();
+    return;
+  }
+
+  // New valid scan
+  const entry = buildLogEntry(data);
+  scanLog.push(entry);
+  safeSet(SCAN_LOG_KEY, scanLog);
+
+  showResult('success', '✅ تم تسجيل الدخول', null, data);
+  playSound('success');
+  updateStats();
+  renderLog();
+}
+
+function buildLogEntry(data) {
+  return {
+    id: Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+    uniqueId: data.u,
+    name: data.n,
+    mainGuest: data.m,
+    submissionId: data.s,
+    qrIndex: data.i,
+    totalGuests: data.t,
+    scannedAt: Date.now(),
+    isDuplicate: false
+  };
+}
+
+function showResult(type, statusText, customHtml, data, previousScan) {
+  const container = document.getElementById('scan-result');
+
+  if (customHtml && !data) {
+    container.innerHTML = `
+      <div class="result-card ${type}">
+        <div class="result-status">
+          <span class="result-status-icon">${statusText.charAt(0)}</span>
+          <span>${statusText.slice(2)}</span>
+        </div>
+        <div style="color:rgba(245,232,200,0.85);line-height:1.7;font-size:0.92rem">${customHtml}</div>
+      </div>
+    `;
+    return;
+  }
+
+  // Calculate group progress
+  const groupScans = scanLog.filter(s => s.submissionId === data.s && !s.isDuplicate);
+  const scannedFromGroup = groupScans.length + (type === 'success' ? 1 : 0);
+  const totalInGroup = data.t;
+  const progressPct = Math.min(100, (scannedFromGroup / totalInGroup) * 100);
+
+  let extraInfo = '';
+  if (type === 'duplicate' && previousScan) {
+    const timeDiff = formatTimeAgo(previousScan.scannedAt);
+    extraInfo = `
+      <div style="margin-top:16px;padding:14px;background:rgba(251,191,36,0.1);border-radius:10px;border-right:2px solid var(--warning);font-size:0.88rem;color:#fcd34d">
+        ⚠️ تم استخدام هذه البطاقة سابقاً قبل ${timeDiff}.
+      </div>
+    `;
+  }
+
+  container.innerHTML = `
+    <div class="result-card ${type}">
+      <div class="result-status">
+        <span class="result-status-icon">${type === 'success' ? '✅' : '⚠️'}</span>
+        <span>${statusText.replace(/^[^ ]+ /, '')}</span>
+      </div>
+
+      <div class="result-name">${escapeHtml(data.n)}</div>
+      <div style="color:rgba(245,232,200,0.65);font-size:0.85rem;margin-bottom:6px">
+        من مجموعة: <strong style="color:var(--gold-light)">${escapeHtml(data.m)}</strong>
+      </div>
+
+      <div class="result-detail-grid">
+        <div class="result-detail-box">
+          <div class="result-detail-label">إجمالي الحضور</div>
+          <div class="result-detail-value big">${data.t}</div>
+        </div>
+        <div class="result-detail-box">
+          <div class="result-detail-label">رقم البطاقة</div>
+          <div class="result-detail-value big">${data.i} <small style="opacity:0.5">/ ${data.t}</small></div>
+        </div>
+      </div>
+
+      <div class="result-progress">
+        <div class="result-progress-label">دخول المجموعة</div>
+        <div class="result-progress-bar">
+          <div class="result-progress-fill" style="width:${progressPct}%"></div>
+        </div>
+        <div class="result-progress-text">
+          ${scannedFromGroup} من ${totalInGroup} ضيوف دخلوا من هذه المجموعة
+        </div>
+      </div>
+
+      ${extraInfo}
+    </div>
+  `;
+}
+
+// =====================================================
+// STATS
+// =====================================================
+function updateStats() {
+  const validScans = scanLog.filter(s => !s.isDuplicate);
+  const duplicates = scanLog.filter(s => s.isDuplicate);
+  const uniqueGroups = new Set(validScans.map(s => s.submissionId)).size;
+
+  document.getElementById('stat-checked').textContent = validScans.length;
+  document.getElementById('stat-unique').textContent = uniqueGroups;
+  document.getElementById('stat-dup').textContent = duplicates.length;
+
+  const recentScan = [...scanLog].sort((a, b) => b.scannedAt - a.scannedAt)[0];
+  if (recentScan) {
+    document.getElementById('stat-recent').textContent = formatTime(recentScan.scannedAt);
+    document.getElementById('stat-recent').style.fontSize = '1.2rem';
+  } else {
+    document.getElementById('stat-recent').textContent = '—';
+  }
+}
+
+// =====================================================
+// LOG TABLE
+// =====================================================
+function renderLog() {
+  const body = document.getElementById('log-body');
+  const search = document.getElementById('log-search').value.trim().toLowerCase();
+
+  let filtered = [...scanLog].sort((a, b) => b.scannedAt - a.scannedAt);
+  if (search) {
+    filtered = filtered.filter(s =>
+      (s.name || '').toLowerCase().includes(search) ||
+      (s.mainGuest || '').toLowerCase().includes(search)
+    );
+  }
+
+  if (filtered.length === 0) {
+    body.innerHTML = `<tr><td colspan="7" class="log-empty">
+      <div class="log-empty-icon">📭</div>
+      ${search ? 'لا توجد نتائج مطابقة للبحث' : 'لم يتم تسجيل أي بطاقة بعد'}
+    </td></tr>`;
+    return;
+  }
+
+  body.innerHTML = filtered.map((s, idx) => `
+    <tr>
+      <td>${idx + 1}</td>
+      <td><strong style="color:var(--gold-light)">${escapeHtml(s.name)}</strong></td>
+      <td>${escapeHtml(s.mainGuest)}</td>
+      <td>${s.qrIndex} / ${s.totalGuests}</td>
+      <td>${countGroupScanned(s.submissionId)} / ${s.totalGuests}</td>
+      <td>${formatTime(s.scannedAt)}</td>
+      <td>${s.isDuplicate
+        ? '<span class="badge duplicate">مكرر</span>'
+        : '<span class="badge attended">حاضر</span>'}</td>
+    </tr>
+  `).join('');
+}
+
+function countGroupScanned(submissionId) {
+  return scanLog.filter(s => s.submissionId === submissionId && !s.isDuplicate).length;
+}
+
+// =====================================================
+// EXPORT / CLEAR
+// =====================================================
+function exportCSV() {
+  if (scanLog.length === 0) {
+    alert('السجل فارغ. لا يوجد ما يمكن تصديره.');
+    return;
+  }
+
+  const headers = ['رقم', 'الاسم', 'المسجل الرئيسي', 'رقم البطاقة', 'إجمالي المجموعة', 'وقت التسجيل', 'الحالة'];
+  const rows = scanLog.map((s, i) => [
+    i + 1,
+    s.name,
+    s.mainGuest,
+    s.qrIndex,
+    s.totalGuests,
+    new Date(s.scannedAt).toLocaleString('ar-EG'),
+    s.isDuplicate ? 'مكرر' : 'حاضر'
+  ]);
+
+  const csv = '\uFEFF' + [headers, ...rows].map(r =>
+    r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')
+  ).join('\n');
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `wedding-checkin-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function clearLog() {
+  if (!confirm('⚠️ تحذير: سيتم مسح جميع سجلات الدخول نهائياً. هل أنت متأكد؟')) return;
+  if (!confirm('تأكيد ثاني: هل تريد بالتأكيد مسح كل البيانات؟')) return;
+  scanLog = [];
+  safeSet(SCAN_LOG_KEY, []);
+  updateStats();
+  renderLog();
+
+  document.getElementById('scan-result').innerHTML = `
+    <div class="scan-result-empty">
+      <div class="scan-result-empty-icon">📡</div>
+      <div>تم مسح السجل بنجاح</div>
+      <div style="font-size:0.8rem;margin-top:8px;opacity:0.7">قم بتوجيه الكاميرا نحو رمز QR</div>
+    </div>
+  `;
+}
+
+// =====================================================
+// HELPERS
+// =====================================================
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  if (sameDay) {
+    return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+  return d.toLocaleString('ar-EG', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function formatTimeAgo(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000) return Math.floor(diff / 1000) + ' ثانية';
+  if (diff < 3600000) return Math.floor(diff / 60000) + ' دقيقة';
+  if (diff < 86400000) return Math.floor(diff / 3600000) + ' ساعة';
+  return Math.floor(diff / 86400000) + ' يوم';
+}
+
+// =====================================================
+// SOUND FEEDBACK
+// =====================================================
+function playSound(type) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === 'success') {
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.4);
+    } else if (type === 'warn') {
+      osc.frequency.setValueAtTime(440, ctx.currentTime);
+      osc.frequency.setValueAtTime(330, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } else if (type === 'error') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    }
+  } catch(e) {}
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  safeSet(SOUND_ENABLED_KEY, soundEnabled);
+  document.getElementById('sound-toggle').textContent = soundEnabled ? '🔊' : '🔇';
+}
+
+document.getElementById('sound-toggle').textContent = soundEnabled ? '🔊' : '🔇';
+</script>
+
+</body>
+</html>
